@@ -1,0 +1,132 @@
+import React, { forwardRef, useState } from 'react';
+import StyledImage from '../static-components/StyledImage';
+import { useAppContext, useDispatchAppContext } from '../../react-wrapper/Context/AppContext';
+
+const Table = ({tableData, payload, onHandlePreview }) => {
+
+    //State
+   const [tableSorted, setTableSorted] = useState(false);
+   const [currentSelected, setCurrentSelected] = useState(null);
+
+    //Event
+
+    const handleTableSort = (e) => {
+        console.log(e, "tabel sorting")
+        setTableSorted(!tableSorted)
+    }
+
+    const handleTableSelect = (e) => {
+
+        const repo = JSON.parse(e.target.dataset.payload);
+        
+        //Mark the Selected Tabel with a highlight
+
+        setCurrentSelected(repo.name)
+
+        if(onHandlePreview) {
+            return onHandlePreview(repo);
+        }
+
+    }
+
+    return (
+        <div className="w-full animate__animated animate__fadeIn">
+            
+            <table className="min-w-max w-full table-auto">
+
+                <thead>
+                    <tr className="header capitalize text-sm leading-normal">
+                        {
+                            tableData.tableHeaders.map((header, index) => (
+                                <th key={index} className="py-3 px-6 text-left cursor-pointer" onClick={handleTableSort}>
+                                    <div className="flex justify-start">
+                                        <p className="font-bold">{header.title}</p>     
+                                        {
+                                            header.icon && 
+                                            <StyledImage className={`cursor-pointer mt-1 ml-1 transform ${tableSorted ? 'rotate-180' : 'rotate-0'}`}
+                                            src={header.icon} width={10} height={10} /> 
+                                        }
+                                    </div>
+                                </th>
+                            ))
+                        }
+                    </tr>
+                </thead>
+
+                <tbody className="text-gray-600 text-sm font-light" >
+                    {
+                        tableData.tableLists.map((repo, index) => (
+                            <tr key={repo.name} className={`${repo.name === currentSelected && "list-tr-active"} list-tr bg-white`} 
+                                onClick={handleTableSelect} >
+                                <td className="py-3 px-6 text-left" data-payload={JSON.stringify(repo)}>
+                                    {repo.name}
+                                </td>
+                                <td className="py-3 px-6 text-left" data-payload={JSON.stringify(repo)}>
+                                    {repo.open_issues_count}
+                                </td>
+                                <td className="py-3 px-6 text-left" data-payload={JSON.stringify(repo)}>
+                                    {repo.stargazers_count}
+                                </td>
+                            </tr>
+                        ))
+                    }
+                </tbody>
+            </table>
+
+            <div className="my-5 flex justify-center">
+                <StyledImage className="cursor-pointer mx-3 hover:scale-110 transform"
+                        src="/images/icons/mdi_chevron-left.png" width={24} height={24} /> 
+
+                    <div className="flex justify-center items-center -mt-1">
+                        <p className="h-6 w-6 rounded mx-1 text-center text-sm text-primaryTextColor bg-primaryTextColor pt-1 cursor-pointer">
+                            1
+                        </p>
+                        <p className="h-6 w-6 rounded mx-1 text-center text-sm text-primaryTextColor bg-primaryTextColor pt-1 cursor-pointer">
+                            2
+                        </p>
+                        <p className="h-6 w-6 rounded mx-1 text-center text-sm text-primaryTextColor bg-primaryTextColor pt-1 cursor-pointer">
+                            3
+                        </p>
+                    </div>
+
+                <StyledImage className="cursor-pointer mx-3 hover:scale-110 transform"
+                        src="/images/icons/mdi_chevron-right.png" width={24} height={24} /> 
+            </div>
+
+        <style jsx>{`
+
+                .header {
+                    border-bottom: 2px solid #111111;
+                    // box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.08);
+                    transition: 1s all ease;
+                }
+
+                .header:hover {
+                    // background: #e6e9f2;
+                    transform: scale(1.006);
+                }
+
+                .list-tr {
+                    border-bottom: 2px solid #F1F5F8;
+                    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.08);
+                    transition: 1s all ease;
+                }
+
+                .list-tr-active {
+                    background: #e6e9f2;
+                }
+
+                .list-tr:hover {
+                    background: #e6e9f2;
+                    transform: scale(1.006);
+                }
+         
+            `}
+
+        </style>
+    </div>
+    )
+}
+
+
+export default Table;
