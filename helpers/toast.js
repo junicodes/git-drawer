@@ -1,6 +1,7 @@
 
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Slide, Zoom, Flip, Bounce } from 'react-toastify';
 
 export function Toast(type = "default", position = "top-right", message = "Hello hope you are good"){
 
@@ -12,6 +13,8 @@ export function Toast(type = "default", position = "top-right", message = "Hello
     pauseOnHover: true,
     draggable: true,
     progress: undefined,
+    transition: Slide,
+    className: 'bg-black',
   }
 
   console.log(type, position, message)
@@ -38,7 +41,7 @@ export function Toast(type = "default", position = "top-right", message = "Hello
         break;
       default:
         case "default":
-            toast.error(message, body);
+            toast(message, body);
           break;
   }
 

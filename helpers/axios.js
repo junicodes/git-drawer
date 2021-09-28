@@ -5,7 +5,7 @@ import { LOG_USER_OUT } from "../react-wrapper/Redux/types";
 import { Toast } from "../helpers/toast"
 import 'react-toastify/dist/ReactToastify.css';
 
-export default async function apiRequest({ url, method, body }, dispatch, dispatchAppContext, tokenPermit = true, persistRequest = false) {
+export default async function apiRequest({ url, method, body=null, originUrl="default" }, dispatchAppContext, tokenPermit = true, persistRequest = false) {
 
   let user, token; // declaring a global variable
   
@@ -26,7 +26,7 @@ export default async function apiRequest({ url, method, body }, dispatch, dispat
     const response = await axios.request({
       url,
       method,
-      baseURL: origin,
+      baseURL: originUrl == "default" ? origin : originUrl,
       data: body,
       headers,
       responseType: "json",
@@ -37,6 +37,12 @@ export default async function apiRequest({ url, method, body }, dispatch, dispat
 
     await dispatchAppContext({ type: "PRELODER", payload: false })
 
+    //Validate FOr rate limite error 
+
+    // if(response.headers['x-ratelimit-remaining'] == 0) {
+    //   return Toast("dark", "top-right", "Ooops, too many request was sent to the server, please try again later in a few minutes.");
+    // }
+
     switch (response.status) {
 
       case 500:
@@ -44,31 +50,27 @@ export default async function apiRequest({ url, method, body }, dispatch, dispat
         if(persistRequest) {
           return response;
         }
-        Toast("error", "top-center", "A unexpected error has occured, please refresh, check internet connection and try again or contact support.");
-        break;
+
+        return Toast("dark", "top-right", "A unexpected error has occured, please refresh, check internet connection and try again or contact support.");
       case 501:
-        Toast("error", "top-center", "Ooops something not right, please refresh and try angain or contact support.");
-        break;
+        return Toast("dark", "top-right", "Ooops something not right, please refresh and try angain or contact support.");
       case 401:
-        dispatch({ type: LOG_USER_OUT });
-        break;
+        return dispatchAppContext({ type: "LOGOUT_USER", payload: false })
       case 422:
-        Toast("warning", "top-center",
+        return Toast("warning", "top-right",
          `${response.data.errors ? Object.entries(response.data.errors).forEach(([key, value]) => `${key}: ${value}`) : response.data.message}`)
-        break;
       case 400:
-        Toast("warning", "top-center", response.data.message);
-        break;
+        return Toast("warning", "top-right", response.data.message);
+      case 403:
+        return Toast("dark", "top-right", "Ooops, too many request was sent to the server, please try again later in a few minutes.");
       default:
         return response;
        
     }
-    console.log(response.status)
-    console.log(response)
 
   } catch (error) {
     console.log(error)
-    Toast("error", "top-center", "A unexpected error has occured, please refresh and try again");
+    Toast("error", "top-right", "A unexpected error has occured, please refresh and try again");
 
   }
 }

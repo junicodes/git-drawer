@@ -2,9 +2,8 @@ import styles from './Layout.module.scss';
 import React, {  useRef, useState, useEffect } from "react";
 import Preloader from '@/components/static-components/Preloader';
 import { useAppContext, useDispatchAppContext } from '../../react-wrapper/Context/AppContext';
-import Search from '../sub-components/Search';
 import CustomInputSelect from '../static-components/CustomInputSelect';
-import {searchOrg} from '../../helpers/api-routes/v1';
+import { searchOrgAction } from '../../react-wrapper/Redux/actions/gitHubAction';
 
 const Nav = ({ children }) => {
 
@@ -19,13 +18,12 @@ const Nav = ({ children }) => {
 
 
     const handleInputSelectChange = (payload) => {
-        console.log(payload, "Selected Object push to context state")
+
+        //Format the Repo Context Payload
+        dispatchAppContext({ type: "SELECTED_ORG_REPO", payload: null }); 
 
         //Update the Context State with the current Organization payload
-        dispatchAppContext({
-            type: 'SELECTED_ORGANIZATION',
-            payload
-        });
+        dispatchAppContext({type: 'SELECTED_ORG', payload });
         
     }
 
@@ -34,7 +32,7 @@ const Nav = ({ children }) => {
             <div className="2xl:container 2xl:mx-auto px-2 3xl:px-0">
                 <div className="flex justify-start">
                     <CustomInputSelect ref={customInputRef} onEvent={handleInputSelectChange} 
-                        findUrl={searchOrg}
+                        apiFunc={searchOrgAction}
                         type="search"
                         placeholder="Search organization"
                         target="search"

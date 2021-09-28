@@ -8,14 +8,14 @@ import TimelineChart from '../Charts/GoogleChart/TimelineChart';
 import ScatterChart from '../Charts/HighChart/ScatterChart';
 import PieChart from '../Charts/GoogleChart/PieChart';
 
-const ChartView = ({ children }) => {
+const ChartSelectDropDown = ({ children }) => {
 
     //Use Context   
     const appContext = useAppContext();
     const dispatchAppContext = useDispatchAppContext();
-    
+
     //Context State 
-    const {selectedOrg, selectedOrgRepos, currentChartView} = appContext;
+    const {selectedOrg} = appContext;
 
     //State
     const [customSelects, setCustomSelects] = useState([
@@ -40,21 +40,18 @@ const ChartView = ({ children }) => {
 
     //Event Functions
 
-    return (
-        <>
-            {
-                selectedOrgRepos && selectedOrgRepos.length > 0 &&
-                {
-                    
-                    1: <TimelineChart />,
-                    2: <ScatterChart />,
-                    3: <PieChart />
+    const handleCustomSelect = (payload) => {
+        dispatchAppContext({ type: "CURRENT_CHART_VIEW", payload: Number(payload.id) })
+    }
 
-                }[currentChartView]
-            }
-        </>
+    return (
+        <form className="flex justify-start items-center mt-12">
+            <div className="flex justify-between">
+            <CustomSelect onEvent={handleCustomSelect} customSelects={customSelects} classes={`cursor-pointer`} classWidth={`w-80 text-xs `} />
+            </div>
+        </form>
     )
 
 }
 
-export default ChartView;
+export default ChartSelectDropDown;

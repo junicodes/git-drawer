@@ -1,8 +1,19 @@
 import React, { forwardRef, useState } from 'react';
 import StyledImage from '../static-components/StyledImage';
 import { useAppContext, useDispatchAppContext } from '../../react-wrapper/Context/AppContext';
+import Preloader from './Preloader';
 
-const Table = ({tableData, payload, onHandlePreview }) => {
+const Table = ({paginate, onHandlePreview, onHandlePrev, onHandleNext }) => {
+
+    //Use Context   
+    const appContext = useAppContext();
+    const dispatchAppContext = useDispatchAppContext();
+
+    //Context State 
+    const {selectedOrg, selectedOrgRepos, filteredRepo, paginateRepo} = appContext;
+
+    console.log(filteredRepo, filteredRepo.tableLists, "for the love")
+    
 
     //State
    const [tableSorted, setTableSorted] = useState(false);
@@ -30,14 +41,14 @@ const Table = ({tableData, payload, onHandlePreview }) => {
     }
 
     return (
-        <div className="w-full animate__animated animate__fadeIn">
+        <div className="w-full animate__animated animate__fadeIn relative">
             
             <table className="min-w-max w-full table-auto">
 
                 <thead>
                     <tr className="header capitalize text-sm leading-normal">
                         {
-                            tableData.tableHeaders.map((header, index) => (
+                            filteredRepo.tableHeaders.map((header, index) => (
                                 <th key={index} className="py-3 px-6 text-left cursor-pointer" onClick={handleTableSort}>
                                     <div className="flex justify-start">
                                         <p className="font-bold">{header.title}</p>     
@@ -55,43 +66,47 @@ const Table = ({tableData, payload, onHandlePreview }) => {
 
                 <tbody className="text-gray-600 text-sm font-light" >
                     {
-                        tableData.tableLists.map((repo, index) => (
-                            <tr key={repo.name} className={`${repo.name === currentSelected && "list-tr-active"} list-tr bg-white`} 
-                                onClick={handleTableSelect} >
-                                <td className="py-3 px-6 text-left" data-payload={JSON.stringify(repo)}>
-                                    {repo.name}
-                                </td>
-                                <td className="py-3 px-6 text-left" data-payload={JSON.stringify(repo)}>
-                                    {repo.open_issues_count}
-                                </td>
-                                <td className="py-3 px-6 text-left" data-payload={JSON.stringify(repo)}>
-                                    {repo.stargazers_count}
-                                </td>
-                            </tr>
-                        ))
+                        filteredRepo.tableLists ?
+                            filteredRepo.tableLists.length > 0 &&
+                                filteredRepo.tableLists.map((repo, index) => (
+                                    <tr key={repo.name} className={`${repo.name === currentSelected && "list-tr-active"} list-tr bg-white`} 
+                                        onClick={handleTableSelect} >
+                                        <td className="py-3 px-6 text-left" data-payload={JSON.stringify(repo)}>
+                                            {repo.name}
+                                        </td>
+                                        <td className="py-3 px-6 text-left" data-payload={JSON.stringify(repo)}>
+                                            {repo.open_issues_count}
+                                        </td>
+                                        <td className="py-3 px-6 text-left" data-payload={JSON.stringify(repo)}>
+                                            {repo.stargazers_count}
+                                        </td>
+                                    </tr>
+                                ))
+                        : <Preloader status={true} classSty="flex justify-center mt-32 left-1/2 absolute" />
                     }
                 </tbody>
             </table>
 
-            <div className="my-5 flex justify-center">
-                <StyledImage className="cursor-pointer mx-3 hover:scale-110 transform"
-                        src="/images/icons/mdi_chevron-left.png" width={24} height={24} /> 
+            {
+                filteredRepo.tableLists && filteredRepo.tableLists.length > 0 &&
+                <>
+                    <div className="flex justify-end mt-4">
+                        <p className="border border-red-50 p-2">Page {paginate.page}</p>
+                    </div> 
+                    <div className="flex justify-center">
+                        <div onClick={(e) => onHandlePrev(e)}>
+                            <StyledImage className="cursor-pointer mx-3 hover:scale-110 transform"
+                                src="/images/icons/mdi_chevron-left.png" width={32} height={32} /> 
+                        </div>
 
-                    <div className="flex justify-center items-center -mt-1">
-                        <p className="h-6 w-6 rounded mx-1 text-center text-sm text-primaryTextColor bg-primaryTextColor pt-1 cursor-pointer">
-                            1
-                        </p>
-                        <p className="h-6 w-6 rounded mx-1 text-center text-sm text-primaryTextColor bg-primaryTextColor pt-1 cursor-pointer">
-                            2
-                        </p>
-                        <p className="h-6 w-6 rounded mx-1 text-center text-sm text-primaryTextColor bg-primaryTextColor pt-1 cursor-pointer">
-                            3
-                        </p>
+                        <div onClick={(e) => onHandleNext(e)}>
+                            <StyledImage className="cursor-pointer mx-3 hover:scale-110 transform"
+                                src="/images/icons/mdi_chevron-right.png" width={32} height={32} /> 
+                        </div>
                     </div>
-
-                <StyledImage className="cursor-pointer mx-3 hover:scale-110 transform"
-                        src="/images/icons/mdi_chevron-right.png" width={24} height={24} /> 
-            </div>
+                </>
+            }
+ 
 
         <style jsx>{`
 

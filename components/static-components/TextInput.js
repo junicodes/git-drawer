@@ -48,8 +48,8 @@ const TextInput = forwardRef((
                 {
                     eventType && eventType.includes("onKeyPress") 
                         ? 
-                        <input ref={ref} type={type} name={name} id={name} value={value || ''}
-                        className={className} onChange={inputChange} data-payload={JSON.stringify(dataset)} placeholder={placeHolder} />
+                        <input ref={ref} type={type} name={name} id={name} defaultValue={value || ''}
+                        className={className} onKeyPress={inputChange} data-payload={JSON.stringify(dataset)} placeholder={placeHolder} />
                         : null
                 }
 

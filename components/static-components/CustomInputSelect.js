@@ -1,18 +1,15 @@
-import { Toast } from "../../helpers/toast"
-import { useDispatch } from 'react-redux';
 import { useAppContext, useDispatchAppContext } from "../../react-wrapper/Context/AppContext";
-import { login_Action } from '../../react-wrapper/Redux/actions/authAction';
 import TextInput from './TextInput';
-import Textarea from '../static-components/Textarea';
-import StyledImage from '../static-components/StyledImage';
-import { useRouter } from 'next/router';
 import { useState, useRef, useEffect } from "react";
 import React, { forwardRef } from 'react';
 import Preloader from "./Preloader";
 
 
+const CustomInputSelect = forwardRef(({ onEvent, classes, apiFunc, type, className, label, placeholder, target }, ref) => {
 
-const CustomInputSelect = forwardRef(({ onEvent, classes, findUrl, type, className, label, placeholder, target }, ref) => {
+    //Use Context   
+    const appContext = useAppContext();
+    const dispatchAppContext = useDispatchAppContext();
 
     //State 
     const [show, setShow] = useState(false)
@@ -28,7 +25,7 @@ const CustomInputSelect = forwardRef(({ onEvent, classes, findUrl, type, classNa
         if(action === 'drop') {
             const payload = JSON.parse(e.currentTarget.dataset.payload);
 
-            ref.current.value = payload.data;
+            ref.current.value = payload.login;
             setShow(false);
 
             if(onEvent) {
@@ -39,50 +36,41 @@ const CustomInputSelect = forwardRef(({ onEvent, classes, findUrl, type, classNa
 
     }
 
-    const handleInputSelectChange = async (e) => {
+    const handleInputSelectChangeApi = async (e) => {
 
         if(e.target.value === "") {
             setPreloader(false) 
             return setShow(false) 
         }
        
-        setTimeout(() => {
-            if(findUrl && e.target.value !== "") {
+        if(e.target.value !== "") {
 
-                const apiUrl = findUrl(e.target.value.trim())
-    
-                console.log(apiUrl)
-                
-                setPreloader(true) 
-                setShow(true) 
-    
-                setTimeout(() => {
-                    setCustomInputSelects([
-                        {
-                            id: 1,
-                            data: 'No 15 block VI',
-                        },
-                        {
-                            id: 2,
-                            data: 'Opposite kracy Food',
-                        },
-                        {
-                            id: 3,
-                            data: '12 Genny Street',
-                        },
-                        {
-                            id: 4,
-                            data: '32 Track Street',
-                        },
-                        {
-                            id: 5,
-                            data: 'Block 27 Bram street',
-                        }
-                    ])
-                    setPreloader(false) 
-                }, 3000);
+            //Show Dropdown Preview
+            setPreloader(true) 
+            setShow(true) 
+
+            //Call an APi Here
+            const result = await apiFunc(e.target.value.trim(), dispatchAppContext)
+            
+            //Remove Preloader 
+            setPreloader(false) 
+
+            if(result) {
+                console.log(result)
+                console.log(result.data.items, "payload");
+
+                if(result.data.items.length < 0) {
+                    return setCustomInputSelects({
+                        id: 1,
+                        login: 'No Organization found',
+                    })
+                }
+
+                //Populate the dropdown 
+                setCustomInputSelects(result.data.items)
             }
-        }, 1000);
+
+        }
     }
 
     return (
@@ -96,7 +84,7 @@ const CustomInputSelect = forwardRef(({ onEvent, classes, findUrl, type, classNa
                     dataset={{target}}
                     className={`${className} w-80 h-10 pl-8 text-xs`}
                     eventType={['onKeyUp']}
-                    onEvent={handleInputSelectChange}
+                    onEvent={handleInputSelectChangeApi}
                     placeHolder={placeholder}
                     icon={{
                         file: "/images/icons/search.svg",
@@ -108,10 +96,14 @@ const CustomInputSelect = forwardRef(({ onEvent, classes, findUrl, type, classNa
                 ( show && 
                     <div className={`dropdown border bg-white z-50 w-full mt-3 scroller absolute animate__animated animate__fadeIn`}>
                         {
-                            customInputSelects.length > 0 ?
+                            customInputSelects && customInputSelects.length > 0 ?
                                 customInputSelects.map((x, index) => (
-                                    <div onClick={handleActionApi} data-action='drop' data-payload={JSON.stringify(x)} key={x.id} className={`text-left px-2 text-xs flex items-center custom-select cursor-pointer animate__animated animate__fadeIn`}>
-                                        {x.data}
+                                    <div onClick={handleActionApi} data-action='drop' data-payload={JSON.stringify(x)} key={x.id} 
+                                         className={`text-left px-2 py-6 text-sm flex items-center custom-select cursor-pointer animate__animated animate__fadeIn`}>
+                                        <div className="mr-2">
+                                            <img className="w-10 h-10 rounded-full" src={x.avatar_url} />
+                                        </div>
+                                        {x.login}
                                     </div>
                                 ))
                             : null

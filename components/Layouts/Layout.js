@@ -20,6 +20,16 @@ const Layout = ({ children }) => {
 
     //Use Router
 
+    //Use Class
+    const contextClass = {
+        success: "bg-blue-600",
+        error: "bg-red-600",
+        info: "bg-gray-600",
+        warning: "bg-orange-400",
+        default: "bg-indigo-600",
+        dark: "bg-white-600 font-gray-300",
+    };
+
     return (
         <>
             <Head>
@@ -34,8 +44,14 @@ const Layout = ({ children }) => {
             </Head>
         
             <section>
-                <Preloader status={appContext.preloaderStatus} />
-                <ToastContainer />
+                {/* <Preloader status={appContext.preloaderStatus} /> */}
+                <ToastContainer 
+                  toastClassName={({ type }) => contextClass[type || "default"] + 
+                    " relative flex p-1 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer"
+                  }
+                  bodyClassName={() => "text-xs font-white font-med block p-2"}
+                />
+
                 <Nav /> 
                     <div className="relative w-full">
                          {children}

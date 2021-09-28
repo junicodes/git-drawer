@@ -7,7 +7,26 @@ const AppDispatchContext = createContext()
 //Object Shared State Default Store
 let sharedState = {
     preloaderStatus: false,
-    selectedOrganization: null,
+    currentChartView: 1,
+    selectedOrg: null,
+    selectedOrgRepos: null,
+    filteredRepo: {
+        tableHeaders: [
+            { 
+                title: 'Repository',
+                icon: "/images/icons/dropdown-arrow.svg"
+            },
+            { title: 'Open issues' },
+            { title: 'Stars' }
+        ],
+
+        tableLists: null,
+    },
+    paginateRepo: {
+        start: 0,
+        size: 5,
+        page: 1
+    },
     
 }
 
@@ -16,8 +35,16 @@ const reducer = (state, action) => {
     switch (action.type) {
         case 'PRELODER':
             return sharedState = { ...sharedState, preloaderStatus: action.payload } 
-        case 'SELECTED_ORGANIZATION':
-            return sharedState = { ...sharedState, selectedOrganization: action.payload } 
+        case 'CURRENT_CHART_VIEW':
+            return sharedState = { ...sharedState, currentChartView: action.payload } 
+        case 'SELECTED_ORG':
+            return sharedState = { ...sharedState, selectedOrg: action.payload } 
+        case 'SELECTED_ORG_REPO':
+            return sharedState = { ...sharedState, selectedOrgRepos: action.payload } 
+        case 'FILTERED_REPO':
+            return sharedState = { ...sharedState, filteredRepo: {...state.filteredRepo, ...action.payload } } 
+        case 'PAGINATE_REPO':
+            return sharedState = { ...sharedState, paginateRepo: {...state.paginateRepo, ...action.payload } } 
         default:
             throw new Error(`Unknown action: ${action.type}`)
     }

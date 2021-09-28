@@ -188,7 +188,7 @@ const ScatterChart = ({ data }) => {
 
     return (
         <>
-            <section className={`${styles.scatterChartWrapper} w-full flex my-4 animate__animated animate__fadeIn scroller`}>
+            <section className={`${styles.scatterChartWrapper} w-full flex animate__animated animate__fadeIn scroller`}>
                 <div className="w-full">
                     <figure class="highcharts-figure p-4 bg-white">
                         <div id="scatter">
