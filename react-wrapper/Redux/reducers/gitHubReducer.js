@@ -1,9 +1,9 @@
 import { Storage } from "../../../helpers/storageUtility";
-import { SEARCH_ORGANIZATION } from "../types";
+import { GET_ORG_REPO } from "../types";
 
 // INITIAL State
 const initialState = {
-  active_searched_organization: null,
+  backupOrgRepo: null
 };
 
 
@@ -12,11 +12,11 @@ const gitHubReducer = (state = initialState, { type, payload }) => {
   
     switch (type) {
   
-      case SEARCH_ORGANIZATION:
+      case GET_ORG_REPO:
   
         return {
           ...state,
-          user: payload.data
+          backupOrgRepo: payload
        };
 
       default:

@@ -6,7 +6,7 @@ import StyledImage from './StyledImage';
 const TextInput = forwardRef((
     { onEvent, className, icon, eventType, 
       dataset, label, name, type, placeHolder, 
-      note, value, styles 
+      note, value, styles, disabled
     }, ref) => {
 
     const inputChange = (e) => {
@@ -41,14 +41,14 @@ const TextInput = forwardRef((
                 {
                     eventType && eventType.includes('onKeyUp')
                     ? 
-                        <input ref={ref} type={type} name={name} id={name} defaultValue={value || ''}
+                        <input ref={ref} type={type} name={name} id={name} defaultValue={value || ''} disabled={disabled | false}
                         className={className} styles={styles} onKeyUp={inputChange} data-payload={JSON.stringify(dataset)} placeholder={placeHolder} />
                     : null
                 }
                 {
                     eventType && eventType.includes("onKeyPress") 
                         ? 
-                        <input ref={ref} type={type} name={name} id={name} defaultValue={value || ''}
+                        <input ref={ref} type={type} name={name} id={name} defaultValue={value || ''} disabled={disabled || false}
                         className={className} onKeyPress={inputChange} data-payload={JSON.stringify(dataset)} placeholder={placeHolder} />
                         : null
                 }
@@ -56,7 +56,7 @@ const TextInput = forwardRef((
                 {
                     eventType && eventType.includes("onChange") 
                         ? 
-                        <input ref={ref} type={type} name={name} id={name} value={value || ''}
+                        <input ref={ref} type={type} name={name} id={name} value={value || ''} disabled={disabled || false}
                         className={className} onChange={inputChange} data-payload={JSON.stringify(dataset)} placeholder={placeHolder} />
                         : null
                 }

@@ -190,7 +190,7 @@ const ScatterChart = ({ data }) => {
         <>
             <section className={`${styles.scatterChartWrapper} w-full flex animate__animated animate__fadeIn scroller`}>
                 <div className="w-full">
-                    <figure class="highcharts-figure p-4 bg-white">
+                    <figure className="highcharts-figure p-4 bg-white">
                         <div id="scatter">
                             <div className={`lds-ring flex justify-center pt-20 pb-28`}>
                                 <div></div>
@@ -204,7 +204,7 @@ const ScatterChart = ({ data }) => {
                         </p>
                     </figure>
                 </div>
-                <style jxs>{`
+                <style>{`
                 
                 .highcharts-figure, .highcharts-data-table table {
                     min-width: 360px; 

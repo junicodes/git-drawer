@@ -25,7 +25,7 @@ const PieChart = ({ data }) => {
                     </div>
                 </div>
 
-                <style jxs>{`
+                <style>{`
                 
                 //   svg g:first-of-type path {
                 //     stroke: none;

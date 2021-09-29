@@ -1,5 +1,5 @@
 
-import { LOG_USER_IN } from "../types";
+import { GET_ORG_REPO, LOG_USER_IN } from "../types";
 import apiRequest from "helpers/axios";
 import { Storage } from "../../../helpers/storageUtility" 
 import { searchOrg, getOrgRepos } from "../../../helpers/api-routes/v1.js" 
@@ -29,13 +29,12 @@ export const searchOrgAction = async (value, dispatchAppContext) => {
   
 };
 
-export const getOrgRepoAction = async (value, dispatchAppContext) => {
+export const getOrgRepoAction = async (value, dispatchAppContext, dispatch) => {
 
     //API REQUEST HERE
     const res = await apiRequest({ url: getOrgRepos(value), method: "get", originUrl: githubOrigin }, dispatchAppContext);
 
     if (res) {
-
 
         //Dispatch to Context
         await dispatchAppContext({ //Disable The ceilin preloder
@@ -43,13 +42,11 @@ export const getOrgRepoAction = async (value, dispatchAppContext) => {
             payload: res.data,
         }); 
 
-        //Dispatach payload to a redux state
-        // await dispatch({
-        //     type: LOG_USER_IN,
-        //     payload: {
-        //         data: res
-        //     }
-        // });
+        //Dispatach payload to a redux state as backup store
+        await dispatch({
+            type: GET_ORG_REPO,
+            payload: res.data
+        });
       
       return res;
     }

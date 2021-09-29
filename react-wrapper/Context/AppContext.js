@@ -25,7 +25,8 @@ let sharedState = {
     paginateRepo: {
         start: 0,
         size: 5,
-        page: 1
+        page: 1,
+        skip: 5
     },
     
 }

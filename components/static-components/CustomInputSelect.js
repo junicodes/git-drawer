@@ -55,7 +55,7 @@ const CustomInputSelect = forwardRef(({ onEvent, classes, apiFunc, type, classNa
             //Remove Preloader 
             setPreloader(false) 
 
-            if(result) {
+            if(result && result.status === 200) {
                 console.log(result)
                 console.log(result.data.items, "payload");
 

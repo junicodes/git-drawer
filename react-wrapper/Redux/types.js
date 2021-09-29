@@ -1,6 +1,6 @@
 
 //GItHUb
-export const SEARCH_ORGANIZATION = "SEARCH_ORGANIZATION";
+export const GET_ORG_REPO = "GET_ORG_REPO";
 
 
 

@@ -4,8 +4,13 @@ import Preloader from '@/components/static-components/Preloader';
 import { useAppContext, useDispatchAppContext } from '../../react-wrapper/Context/AppContext';
 import Table from '../static-components/Table';
 import { getOrgRepoAction } from '../../react-wrapper/Redux/actions/gitHubAction';
+import { useDispatch } from "react-redux";
+
 
 const RepoView = () => {
+
+    //Use Redux
+    const dispatch = useDispatch();
 
     //Use Context   
     const appContext = useAppContext();
@@ -15,8 +20,6 @@ const RepoView = () => {
     const {selectedOrg, selectedOrgRepos, paginateRepo} = appContext;
 
     //State
-    const [repoData] = useState();
-
 
     //Use Ref
 
@@ -36,59 +39,30 @@ const RepoView = () => {
         console.log(e)
         console.log("table clicked")
         // const payload = JSON.parse(e.currentTarget.dataset.payload);
-
     }
 
     //Api Call
     const getOrgReposApi = async (e) => {
 
         //Call an APi Here
-        const result = await getOrgRepoAction(selectedOrg.login, dispatchAppContext)
-
+        const result = await getOrgRepoAction(selectedOrg.login, dispatchAppContext, dispatch)
         console.log(result)
-
-        if(result) {
-            console.log(result)
-            console.log(result.data, "payload repo");
-
+        if(result && result.status === 200) {
             //Splice out what is needed for table from the incoming payload array
-            const newItems = result.data.slice(paginateRepo.start, paginateRepo.size)
+            const newItems = result.data.slice(paginateRepo.start, paginateRepo.skip)
 
             //Update the General filtered repo context api
             dispatchAppContext({ type: "FILTERED_REPO", payload: {tableLists: newItems} });
 
         }
     }
-
-    console.log(selectedOrgRepos, "in view")
-
-    const handlePrevPage = (e) => {
-        console.log(e)
-    }
-
-    const handleNextPage = (e) => {
-        console.log(e)
-        //Splice out the new page from the context api org repo arrray and update the the local componet repo
-        
-        console.log(selectedOrgRepos)
-
-        dispatchAppContext({ type: "PAGINATE_REPO", payload: {
-            page: paginateRepo.page + 1
-        } });
-
-        // setPaginate({ ...repoData, ['page']: paginate.num + 1 });
-    }
-
+    
     return (
         <>
             {
                 selectedOrgRepos && 
                     <div className="repo-table my-4">
-                        <Table paginate={paginateRepo}
-                               onHandlePreview={handlePreview} 
-                               onHandlePrev={handlePrevPage} 
-                               onHandleNext={handleNextPage} 
-                        /> 
+                        <Table onHandlePreview={handlePreview} /> 
                     </div>
             }
         </>
