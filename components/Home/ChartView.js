@@ -4,7 +4,7 @@ import Preloader from '@/components/static-components/Preloader';
 import { useAppContext, useDispatchAppContext } from '../../react-wrapper/Context/AppContext';
 import TextInput from '../static-components/TextInput';
 import CustomSelect from '../static-components/CustomSelect';
-import TimelineChart from '../Charts/GoogleChart/TimelineChart';
+import TimelineChart from '../Charts/ApexChart/TimelineChart';
 import ScatterChart from '../Charts/HighChart/ScatterChart';
 import PieChart from '../Charts/GoogleChart/PieChart';
 
