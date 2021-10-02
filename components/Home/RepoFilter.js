@@ -41,8 +41,7 @@ const RepoFilter = ({ children }) => {
     useEffect(() => {
         //Listen for Min and Max and update the context state
         if(filterIssueError === false && repoFilter.minIssueCount && repoFilter.maxIssueCount) {
-            console.log("in view")
-
+            
             //filter the repo payload from min issue to max issue limit 
             let filtered = backupOrgRepo.filter(backupOrgRepo => 
                 backupOrgRepo['open_issues_count'] >= repoFilter.minIssueCount

@@ -14,13 +14,15 @@ export default async function apiRequest({ url, method, body=null, originUrl="de
     token = user ? user.token : null;
   }
 
+  token = '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';
+
   let headers = {
     Accept: "application/json",
     "Content-Type": "application/json",
     // 'Access-Control-Allow-Origin': '*',
   };
 
-  if (token) headers.Authorization = `Bearer ${token}`;
+  if (token) headers.Authorization = `token ${token}`;
 
   try {
     const response = await axios.request({
@@ -38,10 +40,6 @@ export default async function apiRequest({ url, method, body=null, originUrl="de
     await dispatchAppContext({ type: "PRELODER", payload: false })
 
     //Validate FOr rate limite error 
-
-    // if(response.headers['x-ratelimit-remaining'] == 0) {
-    //   return Toast("dark", "top-right", "Ooops, too many request was sent to the server, please try again later in a few minutes.");
-    // }
 
     switch (response.status) {
 

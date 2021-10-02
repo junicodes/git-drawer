@@ -14,14 +14,14 @@ const Chart = dynamic(
     { ssr: false }
 );
 
-const TimeChart = ({ data }) => {
+const ScatterChart = ({ data }) => {
 
     //Use Context   
     const appContext = useAppContext();
     const dispatchAppContext = useDispatchAppContext();
 
     //Context State 
-    const {selectedOrgRepos, filteredRepo} = appContext;
+    const {selectedOrgRepos} = appContext;
     const { github: { backupOrgRepo } } = useSelector((state) => state);
 
     //State
@@ -40,7 +40,7 @@ const TimeChart = ({ data }) => {
                 bar: {
                     horizontal: true,
                     // distributed: true,
-                    barHeight: '30%',
+                    barHeight: '40%',
                     dataLabels: {
                         hideOverflowingLabels: false
                     }
@@ -102,18 +102,19 @@ const TimeChart = ({ data }) => {
     //Use Effect
 
     useEffect(async () => {
-        if(filteredRepo.tableLists && filteredRepo.tableLists.length) {
+        if(backupOrgRepo && backupOrgRepo.length) {
             const result = await repoTimeline();
+            console.log(result, "yellow yard")
             //Set The state 
             setParameter({...parameter, ['series']: [{data: result }]})
         }
-    }, [filteredRepo]);
+    }, [backupOrgRepo]);
     
       const repoTimeline = async () => {
 
             const data = [];
 
-            filteredRepo.tableLists.map(x => {
+            backupOrgRepo.map(x => {
                 data.push({
                     x: x.name,
                     y: [
@@ -130,7 +131,7 @@ const TimeChart = ({ data }) => {
 
     return (
         <>
-            <section className={`${styles.timeChartWrapper} w-full flex animate__animated animate__fadeIn scroller`}>
+            <section className={`${styles.scatterChartWrapper} w-full flex animate__animated animate__fadeIn scroller`}>
                 <div className="w-full">
                     <figure className="highcharts-figure p-4 bg-white">
                         <div id="highchart_timeline">
@@ -142,7 +143,7 @@ const TimeChart = ({ data }) => {
                                             series={parameter.series}
                                             type="rangeBar"
                                             width="100%"
-                                            height={350}
+                                            height={400}
                                         />
                                     </div>
                                 </div>
@@ -153,7 +154,7 @@ const TimeChart = ({ data }) => {
                             <p style={{color: '#555456'}} className="text-xs">Last activity</p>
                         </div>
                         <p className="chart-note text-center text-xs">
-                           Representation of all respective repo timeline per page
+                           Representation of all respective repo timeline 
                         </p>
                     </figure>
                 </div>
@@ -200,4 +201,4 @@ const TimeChart = ({ data }) => {
 }
 
 
-export default TimeChart;
+export default ScatterChart;

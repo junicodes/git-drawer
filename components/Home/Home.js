@@ -6,9 +6,13 @@ import RepoView from './RepoView';
 import ChartView from './ChartView';
 import ChartSelectDropDown from './ChartSelectDropdown';
 import RepoFilter from './RepoFilter';
-
+import { useSelector, useDispatch } from "react-redux";
 
 const Home = ({ children }) => {
+
+
+    //Redux State
+    const { github: { backupOrgRepo } } = useSelector((state) => state);
 
     //Use Context   
     const appContext = useAppContext();
@@ -23,7 +27,6 @@ const Home = ({ children }) => {
 
     //Use Router
 
-    console.log(!selectedOrgRepos, "yyyyy")
     return (
         <section className={`${styles.homeWrapper}`}>
             {
@@ -56,7 +59,7 @@ const Home = ({ children }) => {
                         <Preloader status={selectedOrgRepos === null} classSty="flex justify-center top-1/2 left-1/2 absolute" />
 
                         {
-                          selectedOrgRepos && selectedOrgRepos.length <= 0 &&
+                          backupOrgRepo && backupOrgRepo.length <= 0 &&
                              <div className="absolute top-1/2 left-1/2 -translate-x-16 transform">No Repo Found</div>
                         }
 

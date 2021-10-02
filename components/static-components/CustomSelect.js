@@ -13,10 +13,8 @@ const CustomSelect = ({ onEvent, customSelects, classes, classWidth }) => {
 
     //Event
     const handleActionApi = (e) => {
-        console.log(e)
 
         const action = e.currentTarget.dataset.action;
-        console.log(action)
 
         if(action === 'show') {
             return setShow(!show ? true : false) 
@@ -24,7 +22,6 @@ const CustomSelect = ({ onEvent, customSelects, classes, classWidth }) => {
 
         if(action === 'drop') {
             const payload = JSON.parse(e.currentTarget.dataset.payload);
-            console.log(payload)
             
             setPreviewSelected(payload.title)
             setShow(false);

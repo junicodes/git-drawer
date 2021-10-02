@@ -14,7 +14,6 @@ const DropDownLayout = ({onEvent, showDropDown}) => {
 
     //Event
     const handleActionApi = (e) => {
-        console.log(e)
         if(onEvent) {
             onEvent(e)
         }

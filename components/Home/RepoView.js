@@ -46,7 +46,6 @@ const RepoView = () => {
 
         //Call an APi Here
         const result = await getOrgRepoAction(selectedOrg.login, dispatchAppContext, dispatch)
-        console.log(result)
         if(result && result.status === 200) {
             //Splice out what is needed for table from the incoming payload array
             const newItems = result.data.slice(paginateRepo.start, paginateRepo.skip)

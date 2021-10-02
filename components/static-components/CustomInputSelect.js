@@ -3,9 +3,14 @@ import TextInput from './TextInput';
 import { useState, useRef, useEffect } from "react";
 import React, { forwardRef } from 'react';
 import Preloader from "./Preloader";
+import { GET_ORG_REPO } from "../../react-wrapper/Redux/types";
+import { useDispatch } from "react-redux";
 
 
 const CustomInputSelect = forwardRef(({ onEvent, classes, apiFunc, type, className, label, placeholder, target }, ref) => {
+
+    //Use Redux
+    const dispatch = useDispatch();
 
     //Use Context   
     const appContext = useAppContext();
@@ -38,39 +43,68 @@ const CustomInputSelect = forwardRef(({ onEvent, classes, apiFunc, type, classNa
 
     const handleInputSelectChangeApi = async (e) => {
 
-        if(e.target.value === "") {
-            setPreloader(false) 
-            return setShow(false) 
-        }
-       
-        if(e.target.value !== "") {
-
-            //Show Dropdown Preview
-            setPreloader(true) 
-            setShow(true) 
-
-            //Call an APi Here
-            const result = await apiFunc(e.target.value.trim(), dispatchAppContext)
-            
-            //Remove Preloader 
-            setPreloader(false) 
-
-            if(result && result.status === 200) {
-                console.log(result)
-                console.log(result.data.items, "payload");
-
-                if(result.data.items.length < 0) {
-                    return setCustomInputSelects({
-                        id: 1,
-                        login: 'No Organization found',
-                    })
-                }
-
-                //Populate the dropdown 
-                setCustomInputSelects(result.data.items)
+        setTimeout( async () => {
+            if(e.target.value === "") {
+                setPreloader(false) 
+                return setShow(false) 
             }
+           
+            if(e.target.value !== "") {
+    
+                //Show Dropdown Preview
+                setPreloader(true) 
+                setShow(true) 
 
-        }
+                //Restart the view interface
+                //Clear the slected Organization context state 
+                await dispatchAppContext({
+                    type: "SELECTED_ORG",
+                    payload: null,
+                }); 
+
+                //CLear the repo from context state 
+                await dispatchAppContext({
+                    type: "SELECTED_ORG_REPO",
+                    payload: null,
+                });
+                
+                await dispatchAppContext({
+                    type: "FILTERED_REPO",
+                    payload: {tableLists: null},
+                });
+
+                await dispatchAppContext({
+                    type: "PAGINATE_REPO",
+                    payload:  { start: 0, size: 5, page: 1, skip: 5 },
+                });
+
+                //Clear the backup repo 
+                await dispatch({
+                    type: GET_ORG_REPO,
+                    payload: null
+                });
+                
+                //Call an APi Here
+                const result = await apiFunc(e.target.value.trim(), dispatchAppContext)
+                
+                //Remove Preloader 
+                setPreloader(false) 
+    
+                if(result && result.status === 200) {
+    
+                    if(result.data.items.length < 0) {
+                        return setCustomInputSelects({
+                            id: 1,
+                            login: 'No Organization found',
+                        })
+                    }
+    
+                    //Populate the dropdown 
+                    setCustomInputSelects(result.data.items)
+                }
+    
+            }
+        }, 2000);
     }
 
     return (

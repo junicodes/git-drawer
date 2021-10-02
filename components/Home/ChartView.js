@@ -7,8 +7,13 @@ import CustomSelect from '../static-components/CustomSelect';
 import TimelineChart from '../Charts/ApexChart/TimelineChart';
 import ScatterChart from '../Charts/HighChart/ScatterChart';
 import PieChart from '../Charts/GoogleChart/PieChart';
+import { useSelector, useDispatch } from "react-redux";
+
 
 const ChartView = ({ children }) => {
+
+    //Redux State
+    const { github: { backupOrgRepo } } = useSelector((state) => state);
 
     //Use Context   
     const appContext = useAppContext();
@@ -43,7 +48,7 @@ const ChartView = ({ children }) => {
     return (
         <>
             {
-                selectedOrgRepos && selectedOrgRepos.length > 0 &&
+                selectedOrg && backupOrgRepo && backupOrgRepo.length > 0 &&
                 {
                     
                     1: <TimelineChart />,
