@@ -162,7 +162,7 @@ const ScatterChart = ({ data }) => {
       greaterThan25percent: []
     };
 
-    let token = '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';
+    let token = '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';
     let total = 0;
     let error = false;
 
