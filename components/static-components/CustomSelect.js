@@ -48,10 +48,11 @@ const CustomSelect = ({ onEvent, customSelects, classes, classWidth }) => {
             
             {
                 ( show && 
-                    <div className={`${classWidth} absolute border bg-white z-50`}>
+                    <div className={`${classWidth} absolute border bg-white z-50 cursor-pointer`}>
                         {
                             customSelects.map((x, index) => (
-                                <div onClick={handleActionApi} data-action='drop' data-payload={JSON.stringify(x)} key={x.id} className={`text-left flex items-center px-3 py-1 ${index != 0 && 'mt-2'} custom-select text-primaryDarkGray`}>
+                                <div onClick={handleActionApi} data-action='drop' data-payload={JSON.stringify(x)} key={x.id} 
+                                    className={`text-left flex items-center px-3 py-1 custom-select text-primaryDarkGray`}>
                                     {x.title}
                                 </div>
                             ))

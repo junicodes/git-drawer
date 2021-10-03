@@ -14,7 +14,7 @@ export default async function apiRequest({ url, method, body=null, originUrl="de
     token = user ? user.token : null;
   }
 
-  token = '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';
+  token = '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';
 
   let headers = {
     Accept: "application/json",
@@ -39,7 +39,7 @@ export default async function apiRequest({ url, method, body=null, originUrl="de
 
     await dispatchAppContext({ type: "PRELODER", payload: false })
 
-    //Validate FOr rate limite error 
+    console.log(response)
 
     switch (response.status) {
 
@@ -53,7 +53,8 @@ export default async function apiRequest({ url, method, body=null, originUrl="de
       case 501:
         return Toast("dark", "top-right", "Ooops something not right, please refresh and try angain or contact support.");
       case 401:
-        return dispatchAppContext({ type: "LOGOUT_USER", payload: false })
+        // return dispatchAppContext({ type: "LOGOUT_USER", payload: false })
+        return Toast("dark", "top-right", "Ooops something not right, please refresh and try angain or contact support.");
       case 422:
         return Toast("warning", "top-right",
          `${response.data.errors ? Object.entries(response.data.errors).forEach(([key, value]) => `${key}: ${value}`) : response.data.message}`)

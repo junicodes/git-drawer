@@ -104,7 +104,7 @@ const CustomInputSelect = forwardRef(({ onEvent, classes, apiFunc, type, classNa
                 }
     
             }
-        }, 2000);
+        }, 1000);
     }
 
     return (

@@ -22,14 +22,17 @@ const ScatterChart = ({ data }) => {
   //Context State 
   const { selectedOrg, selectedOrgRepos, filteredRepo } = appContext;
 
-  //State
-  const [canRefresh, setCanRefresh] = useState(false);
-  const [chartValues, setChartValues] = useState({
+  //variables
+  const defaultVal = {
     lessThan100: [],
     lessThan10percent: [],
     lessThan25percent: [],
     greaterThan25percent: []
-  })
+  }
+
+  //State
+  const [canRefresh, setCanRefresh] = useState("no-active");
+  const [chartValues, setChartValues] = useState(defaultVal)
 
 
   //Use Effect
@@ -108,29 +111,45 @@ const ScatterChart = ({ data }) => {
       },
       series: [
         {
-          name: 'Close Issues Less than 100',
+          name: '<p style="font-size: 8px">Close Issues Less than 100</p>',
           color: 'black',
-          data: chartValues.lessThan100
+          data: chartValues.lessThan100,
+          marker: {
+              symbol: 'circle'
+          }
 
         }, {
-          name: 'Not More than 10%',
+          name: '<p style="font-size: 8px">Fraction of Open issue to all not more than 10%</p>',
           color: 'green',
-          data: chartValues.lessThan10percent
+          data: chartValues.lessThan10percent,
+          marker: {
+              symbol: 'circle'
+          }
         }, {
-          name: 'Not More than 25%',
+          name: '<p style="font-size: 8px">Fraction of Open issue to all not more than 25%</p>',
           color: 'yellow',
-          data: chartValues.lessThan25percent
+          data: chartValues.lessThan25percent,
+          marker: {
+            symbol: 'circle'
+          }
         }, {
-          name: 'Greater than 25%',
+          name: '<p style="font-size: 8px">Fraction of Open issue to all more than 25%</p>',
           color: 'red',
-          data: chartValues.greaterThan25percent
+          data: chartValues.greaterThan25percent,
+          marker: {
+            symbol: 'circle'
+          }
         }]
     });
   }, [chartValues])
 
   useEffect(async () => {
     if (filteredRepo.tableLists && filteredRepo.tableLists.length) {
-      await getData();
+      setTimeout( async () => {
+        setChartValues(defaultVal)
+        setCanRefresh("loading")
+        await getData();
+      }, 1000);
     }
   }, [filteredRepo]);
 
@@ -143,12 +162,9 @@ const ScatterChart = ({ data }) => {
       greaterThan25percent: []
     };
 
-    let token = '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';
+    let token = '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';
     let total = 0;
     let error = false;
-
-
-      try {
 
         Promise.all(
             filteredRepo.tableLists.map( async element => {
@@ -211,25 +227,19 @@ const ScatterChart = ({ data }) => {
           ).then(() => {
             //Validate the date to prevent undefine values
             if(error ) {
-              setChartValues({
-                lessThan100: [],
-                lessThan10percent: [],
-                lessThan25percent: [],
-                greaterThan25percent: []
-              })
-              setCanRefresh(true)
+              setChartValues(defaultVal)
+              setCanRefresh("refresh")
               return Toast("dark", "top-right", 
               "Ooops!... an unexpected error occured, github rate limit error, please refresh and try again.");
             }
 
             //Update thr state
-            setCanRefresh(false)
+            setCanRefresh("no-active")
             setChartValues(data)
+        }).catch((error) => {
+          console.log(error)
+          Toast("dark", "top-right", "A unexpected error has occured, please refresh, check internet connection and try again or contact support.");
         })
-        
-      } catch (error) {
-        Toast("dark", "top-right", "A unexpected error has occured, please refresh, check internet connection and try again or contact support.");
-      }
 
   }
 
@@ -238,10 +248,20 @@ const ScatterChart = ({ data }) => {
       <section className={`${styles.scatterChartWrapper} w-full flex animate__animated animate__fadeIn scroller`}>
         <div className="w-full relative">
           {
-            canRefresh &&
+            canRefresh == "refresh" &&
             <p onClick={getData} className="text-green-500 absolute top-52 z-50 left-1/2 transform -translate-x-4 cursor-pointer">Refresh</p>
           }
-          
+          {
+            canRefresh == "loading" &&
+            <div className="text-green-500 absolute top-52 z-50 left-1/2 transform -translate-y-4 cursor-pointer">
+              <div className={`lds-ring flex justify-center`}>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
+          }
           <figure className="highcharts-figure p-4 bg-white">
             <div id="scatter">
               <div className={`lds-ring flex justify-center pt-20 pb-28`}>
