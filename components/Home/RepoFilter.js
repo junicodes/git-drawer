@@ -47,6 +47,9 @@ const RepoFilter = ({ children }) => {
         if(checkExistence && checkExistence.length > 0) {
             //For issue filter
             if(checkExistence[0].inputType === "issueFilter") {
+                //disable the repo name filter
+                setDisableRepoNameFilter(true )
+                setFilterWarningNote("The input field for (Filter repositories by name) has been disabled for flexibility")
                 const lastVal = checkExistence[0].lastFilteredValue.split("|")
                 return setRepoFilter({ ...repoFilter, ...{
                     minIssueCount: lastVal[0],
@@ -55,6 +58,9 @@ const RepoFilter = ({ children }) => {
             }
 
             //For name filter
+            //Format and disable the issue filter for flexibility
+            setDisableIssueFilter(true)
+            setFilterWarningNote("The input field for (Filter by number of issues) has been disabled for flexibility.")
             setRepoFilter({ ...repoFilter, ["name"]: checkExistence[0].lastFilteredValue });
         }
        
