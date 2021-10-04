@@ -6,7 +6,7 @@ import TextInput from '../static-components/TextInput';
 import CustomSelect from '../static-components/CustomSelect';
 import TimelineChart from '../Charts/ApexChart/TimelineChart';
 import ScatterChart from '../Charts/HighChart/ScatterChart';
-import PieChart from '../Charts/GoogleChart/PieChart';
+import PieChart from '../Charts/ApexChart/PieChart';
 import { useSelector, useDispatch } from "react-redux";
 
 

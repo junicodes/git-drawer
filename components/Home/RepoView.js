@@ -17,7 +17,7 @@ const RepoView = () => {
     const dispatchAppContext = useDispatchAppContext();
 
     //Context State
-    const {selectedOrg, selectedOrgRepos, paginateRepo} = appContext;
+    const {selectedOrg, selectedOrgRepos, paginateRepo, filteredRepo} = appContext;
 
     //State
 
@@ -31,14 +31,16 @@ const RepoView = () => {
         }
     }, [selectedOrg])
 
+    useEffect(() => {
+        dispatchAppContext({ type: "TABLE_SELECTED_REPO", payload: null });
+    }, [filteredRepo])
+
     //Custom Function
 
 
     //Event Functions
-    const handlePreview = (e) => {
-        console.log(e)
-        console.log("table clicked")
-        // const payload = JSON.parse(e.currentTarget.dataset.payload);
+    const handlePreview = (repo) => {
+        dispatchAppContext({ type: "TABLE_SELECTED_REPO", payload: repo });
     }
 
     //Api Call

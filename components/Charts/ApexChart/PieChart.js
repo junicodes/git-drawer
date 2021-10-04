@@ -14,147 +14,112 @@ const Chart = dynamic(
     { ssr: false }
 );
 
-const ScatterChart = ({ data }) => {
+const PieChart = ({ data }) => {
 
     //Use Context   
     const appContext = useAppContext();
     const dispatchAppContext = useDispatchAppContext();
 
     //Context State 
-    const {selectedOrgRepos} = appContext;
+    const {selectedOrgRepos, filteredRepo, tableSelectedRepo} = appContext;
     const { github: { backupOrgRepo } } = useSelector((state) => state);
+    const repo = tableSelectedRepo ? tableSelectedRepo : filteredRepo.tableLists[0];
 
     //State
+    const [canRefresh, setCanRefresh] = useState("no-active");
     const [parameter, setParameter] = useState({
-        series: [
-            {
-              data: []
-            }
-          ],
+          series: [],
           options: {
             chart: {
-              height: 350,
-              type: 'rangeBar'
+                width: 380,
+                type: 'pie',
             },
-            plotOptions: {
-                bar: {
-                    horizontal: true,
-                    // distributed: true,
-                    barHeight: '40%',
-                    dataLabels: {
-                        hideOverflowingLabels: false
-                    }
+            labels: [],
+              responsive: [{
+                breakpoint: 480,
+                options: {
+                  chart: {
+                    width: 200
+                  },
+                  legend: {
+                    position: 'bottom'
+                  }
                 }
-            },
-            // dataLabels: {
-            //     enabled: true,
-            //     formatter: function(val, opts) {
-            //       var label = opts.w.globals.labels[opts.dataPointIndex]
-            //       var a = dayjs(val[0])
-            //       var b = dayjs(val[1])
-            //       var diff = b.diff(a, 'days')
-            //       return label + ': ' + diff + (diff > 1 ? ' days' : ' day')
-            //     },
-            //     style: {
-            //       colors: ['#111111', '#111111']
-            //     }
-            // },
-            fill: {
-                type: 'gradient',
-                gradient: {
-                  shade: 'light',
-                  type: 'vertical',
-                  shadeIntensity: 0.25,
-                  gradientToColors: undefined,
-                  inverseColors: true,
-                  opacityFrom: 1,
-                  opacityTo: 1,
-                  stops: [50, 0, 100, 100]
-                }
-            },
-            xaxis: {
-              type: 'datetime'
-            },
-            yaxis: {
-                show: false
-            },
-            grid: {
-                row: {
-                    colors: ['#f3f4f5', '#fff'],
-                    opacity: 1
-                }
-            },
-            stroke: {
-                width: 1
-              },
-            fill: {
-                type: 'solid',
-                opacity: 0.6,
-                color: "red"
-            },
-            legend: {
-                position: 'top',
-                horizontalAlign: 'left'
-              }
-          },
+            }]
+          }
     })
 
     //Use Effect
 
     useEffect(async () => {
         if(backupOrgRepo && backupOrgRepo.length) {
-            const result = await repoTimeline();
-            console.log(result, "yellow yard")
-            //Set The state 
-            setParameter({...parameter, ['series']: [{data: result }]})
-        }
-    }, [backupOrgRepo]);
-    
-      const repoTimeline = async () => {
+            setCanRefresh("loading")
+            setParameter({...parameter, ...{
+                series: [],
+                options: {
+                    ...parameter.options,
+                    ['labels']: []
+                }
+            }})
 
-            const data = [];
-
-            backupOrgRepo.map(x => {
-                data.push({
-                    x: x.name,
-                    y: [
-                        new Date(x.created_at).getTime(),
-                        new Date(x.updated_at).getTime()
-                    ]
+            setTimeout( () => {
+                // const result = await repoTopics();
+                // console.log(result, "result")
+                const seriesVal = repo.topics.map((x,index) => {
+                    return (index + 2) * 10
                 })
-            });
 
-            return data;
-      };
-
+                //Set The state 
+                setCanRefresh("no-active")
+                setParameter({...parameter, ...{
+                    series: seriesVal,
+                    options: {
+                        ...parameter.options,
+                        ['labels']: repo.topics
+                    }
+                }})
+            }, 500);
+        }
+    }, [backupOrgRepo, tableSelectedRepo]);
+    
     //Use Router
-
     return (
         <>
             <section className={`${styles.scatterChartWrapper} w-full flex animate__animated animate__fadeIn scroller`}>
                 <div className="w-full">
                     <figure className="highcharts-figure p-4 bg-white">
+                        <p className="text-center text-lg">Repo Name: {repo.name}</p>
                         <div id="highchart_timeline">
                            <div className="app">
                                 <div className="row">
                                     <div className="mixed-chart">
+                                        {
+                                            canRefresh == "loading" &&
+                                            <div className="text-green-500 absolute top-36 z-50 left-1/2 transform -translate-x-4 cursor-pointer">
+                                            <div className={`lds-ring flex justify-center`}>
+                                                <div></div>
+                                                <div></div>
+                                                <div></div>
+                                                <div></div>
+                                            </div>
+                                            </div>
+                                        }
+                                        {
+                                            repo.topics.length <= 0 && <p className="text-center mt-20 text-red-400">No Topics Found</p>
+                                        }
                                         <Chart
                                             options={parameter.options}
                                             series={parameter.series}
-                                            type="rangeBar"
+                                            type="pie"
                                             width="100%"
-                                            height={400}
+                                            height={repo.topics.length > 0 ? 400 : 100}
                                         />
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="flex justify-between">
-                            <p style={{color: '#555456'}} className="text-xs">Create Time</p>
-                            <p style={{color: '#555456'}} className="text-xs">Last activity</p>
-                        </div>
                         <p className="chart-note text-center text-xs">
-                           Representation of all respective repo timeline 
+                           Representation of top most discussed topic for each repo
                         </p>
                     </figure>
                 </div>
@@ -201,4 +166,4 @@ const ScatterChart = ({ data }) => {
 }
 
 
-export default ScatterChart;
+export default PieChart;

@@ -15,8 +15,8 @@ export default async function apiRequest({ url, method, body=null, originUrl="de
   }
 
   let headers = {
-    Accept: "application/json",
     "Content-Type": "application/json",
+    "Accept":"application/vnd.github.mercy-preview+json"
     // 'Access-Control-Allow-Origin': '*',
   };
 

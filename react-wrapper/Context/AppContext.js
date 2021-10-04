@@ -28,6 +28,7 @@ let sharedState = {
         page: 1,
         skip: 5
     },
+    tableSelectedRepo: null
     
 }
 
@@ -46,6 +47,8 @@ const reducer = (state, action) => {
             return sharedState = { ...sharedState, filteredRepo: {...state.filteredRepo, ...action.payload } } 
         case 'PAGINATE_REPO':
             return sharedState = { ...sharedState, paginateRepo: {...state.paginateRepo, ...action.payload } } 
+        case 'TABLE_SELECTED_REPO':
+            return sharedState = { ...sharedState, tableSelectedRepo: action.payload } 
         default:
             throw new Error(`Unknown action: ${action.type}`)
     }

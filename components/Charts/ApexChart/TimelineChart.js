@@ -146,10 +146,6 @@ const TimeChart = ({ data }) => {
                                 <div className="row">
                                     <div className="mixed-chart">
                                         {
-                                            canRefresh == "refresh" &&
-                                            <p onClick={getData} className="text-green-500 absolute top-52 z-50 left-1/2 transform -translate-x-4 cursor-pointer">Refresh</p>
-                                        }
-                                        {
                                             canRefresh == "loading" &&
                                             <div className="text-green-500 absolute top- top-36 z-50 left-1/2 transform translate-x-4 cursor-pointer">
                                             <div className={`lds-ring flex justify-center`}>
