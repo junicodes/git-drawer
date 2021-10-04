@@ -47,7 +47,11 @@ const ChartSelectDropDown = ({ children }) => {
     return (
         <form className="flex justify-start items-center mt-12">
             <div className="flex justify-between">
-            <CustomSelect onEvent={handleCustomSelect} customSelects={customSelects} classes={`cursor-pointer`} classWidth={`w-80 text-xs `} />
+            <CustomSelect onEvent={handleCustomSelect} 
+                customSelects={customSelects} 
+                classes={`cursor-pointer`} 
+                classWidth={`w-80 text-xs `} 
+            />
             </div>
         </form>
     )

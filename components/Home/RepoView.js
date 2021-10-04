@@ -32,6 +32,7 @@ const RepoView = () => {
     }, [selectedOrg])
 
     useEffect(() => {
+        //Format the selected repo when table is been clicked to null
         dispatchAppContext({ type: "TABLE_SELECTED_REPO", payload: null });
     }, [filteredRepo])
 
@@ -48,6 +49,7 @@ const RepoView = () => {
 
         //Call an APi Here
         const result = await getOrgRepoAction(selectedOrg.login, dispatchAppContext, dispatch)
+        
         if(result && result.status === 200) {
             //Splice out what is needed for table from the incoming payload array
             const newItems = result.data.slice(paginateRepo.start, paginateRepo.skip)

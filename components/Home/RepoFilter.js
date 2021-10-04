@@ -39,7 +39,6 @@ const RepoFilter = ({ children }) => {
     const filterMaxRepoIssuesRef = useRef();
 
     //UseEffect
-    
     useEffect(() => {
         //Update last filtered input when organization changes
         const lastTrackedInput = Storage.getItem('track_last_repo_input');
@@ -207,16 +206,17 @@ const RepoFilter = ({ children }) => {
         setDisableRepoNameFilter(true )
         setFilterWarningNote("The input field for (Filter repositories by name) has been disabled for flexibility")
         
-        setRepoFilter({ ...repoFilter, [target]: e.target.value }); //Listen for state change in useEffect
+        //LUpdate Issue filter state
+        setRepoFilter({ ...repoFilter, [target]: e.target.value }); 
 
         //Validation -- Min Filter cannot be greater that Max Filter
         if (filterMaxRepoIssuesRef.current.value !== "" && 
             Number(filterMinRepoIssuesRef.current.value) >= Number(filterMaxRepoIssuesRef.current.value)) {
-            //Show indication for issue filter error
+            //Show error indication for issue filter
             return issueFilterErrorAlert("add") 
         }
 
-        //Handle the tracking of filtered last input
+        //Handle the tracking of filtered last input with localstorage
         const val = `${filterMinRepoIssuesRef.current.value }|${filterMaxRepoIssuesRef.current.value }`;
         const type = 'issueFilter';
 
@@ -244,6 +244,8 @@ const RepoFilter = ({ children }) => {
             dispatchAppContext({ type: "SELECTED_ORG_REPO", payload: backupOrgRepo}); 
             return formatFilterState(backupOrgRepo)
         }
+        
+        //Update filter input for repo name 
         setRepoFilter({ ...repoFilter, ['name']: filterRepoNameRef.current.value });
     }
 

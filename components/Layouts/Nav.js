@@ -32,6 +32,7 @@ const Nav = ({ children }) => {
         
     }
 
+    //Format every Context and redux state and start the process again
     const onFormatView = async () => {
         //Clear the slected Organization context state 
         await dispatchAppContext({
