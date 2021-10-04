@@ -4,6 +4,7 @@ import { useAppContext, useDispatchAppContext } from '../../react-wrapper/Contex
 import TextInput from '../static-components/TextInput';
 import StyledImage from '../static-components/StyledImage';
 import { useSelector, useDispatch } from "react-redux";
+import { Storage } from 'helpers/storageUtility';
 
 
 const RepoFilter = ({ children }) => {
@@ -38,10 +39,33 @@ const RepoFilter = ({ children }) => {
     const filterMaxRepoIssuesRef = useRef();
 
     //UseEffect
+    
+    useEffect(() => {
+        //Update last filtered input when organization changes
+        const lastTrackedInput = Storage.getItem('track_last_repo_input');
+        const checkExistence = lastTrackedInput.filter(value => value.orgName === selectedOrg.login);
+
+        if(checkExistence && checkExistence.length > 0) {
+            //For issue filter
+            if(checkExistence[0].inputType === "issueFilter") {
+                const lastVal = checkExistence[0].lastFilteredValue.split("|")
+                return setRepoFilter({ ...repoFilter, ...{
+                    minIssueCount: lastVal[0],
+                    maxIssueCount: lastVal[1]
+                }});
+            }
+
+            //For name filter
+            setRepoFilter({ ...repoFilter, ["name"]: checkExistence[0].lastFilteredValue });
+        }
+       
+    }, [selectedOrg])
+
+
     useEffect(() => {
         //Listen for Min and Max and update the context state
-        if(filterIssueError === false && repoFilter.minIssueCount && repoFilter.maxIssueCount) {
-            
+        if(filterIssueError === false && repoFilter.minIssueCount && repoFilter.maxIssueCount && backupOrgRepo) {
+
             //filter the repo payload from min issue to max issue limit 
             let filtered = backupOrgRepo.filter(backupOrgRepo => 
                 backupOrgRepo['open_issues_count'] >= repoFilter.minIssueCount
@@ -53,10 +77,29 @@ const RepoFilter = ({ children }) => {
              //Dispatch to the context repo list
             dispatchAppContext({ type: "SELECTED_ORG_REPO", payload: filtered });
 
-            updateFilterState(filtered)
+            formatFilterState(filtered)
+
+            //Generate a filter value with pipe symbol seperating the min and max eg (min|max)
+            //we remove this pipe symbol to get the min and max seperately
 
         }
-    }, [repoFilter])
+        
+        //Listen for repo name filter changes
+        if(repoFilter.name && backupOrgRepo) {
+             //filter the repo base on the value
+            let filtered = backupOrgRepo.filter(backupOrgRepo => backupOrgRepo['name'].includes(repoFilter.name));
+
+            //Sort alphabetically
+            const newFilteredRepos = sortInputFirst(repoFilter.name, filtered);
+
+            //Dispatch to the context repo list
+            dispatchAppContext({ type: "SELECTED_ORG_REPO", payload: newFilteredRepos });
+
+            formatFilterState(newFilteredRepos);
+        }
+
+
+    }, [backupOrgRepo, repoFilter])
 
     //Custom Function
     const isNumberKey = (val) => {
@@ -99,13 +142,40 @@ const RepoFilter = ({ children }) => {
         }
     }
 
-    const updateFilterState = (payload) => {
+    const formatFilterState = (payload) => {
         //Update the pagination table
         const newItems = payload.slice(0, paginateRepo.skip)
 
         //Update the General filtered repo context api
         dispatchAppContext({ type: "FILTERED_REPO", payload: {tableLists: newItems} });
         dispatchAppContext({ type: "PAGINATE_REPO", payload: { start: 0, size:  5, page: 1 } });
+    }
+
+    const trackLastFilterInput = (val, type) => {
+        //Store and update the filter input parmanent storage with localstorage 
+        const lastTrackedInput = Storage.getItem('track_last_repo_input');
+        const checkExistence = lastTrackedInput.filter(value => value.orgName === selectedOrg.login);
+
+        if(checkExistence && checkExistence.length > 0) {
+
+            lastTrackedInput.map( x => {
+                if(x.orgName == checkExistence[0].orgName) {
+                   x.lastFilteredValue = val;
+                   x.inputType = type;
+                }
+            });
+
+            return Storage.setItem("track_last_repo_input", lastTrackedInput);
+        }
+
+        // //Create a new filter track for organization name 
+        Storage.setItem("track_last_repo_input", [...lastTrackedInput, 
+            {
+                orgName: selectedOrg.login,
+                inputType: type,
+                lastFilteredValue: val
+            }
+        ]);
     }
 
     //Event Functions
@@ -120,21 +190,24 @@ const RepoFilter = ({ children }) => {
         if(filterMaxRepoIssuesRef.current.value == "" && filterMinRepoIssuesRef.current.value == "") {
             setDisableRepoNameFilter(false); 
             setFilterWarningNote(null)
+
             //Dispatch the redux backeup to context state
             dispatchAppContext({ type: "SELECTED_ORG_REPO", payload: backupOrgRepo}); 
-            updateFilterState(backupOrgRepo)
+            formatFilterState(backupOrgRepo)
         }
 
         //Validation -- Filter Value must be numbers only
-        if (!isNumberKey(e.target.value)) return setRepoFilter({ ...repoFilter, [target]: '' });
+        if (!isNumberKey(e.target.value))
+             return setRepoFilter({ ...repoFilter, [target]: '' });
 
-        if (target === "maxIssueCount" && e.target.value == 0) return setRepoFilter({ ...repoFilter, [target]: '' });
+        if (target === "maxIssueCount" && e.target.value == 0) 
+            return setRepoFilter({ ...repoFilter, [target]: '' });
 
         //disable the repo name filter
         setDisableRepoNameFilter(true )
         setFilterWarningNote("The input field for (Filter repositories by name) has been disabled for flexibility")
         
-        setRepoFilter({ ...repoFilter, [target]: e.target.value });
+        setRepoFilter({ ...repoFilter, [target]: e.target.value }); //Listen for state change in useEffect
 
         //Validation -- Min Filter cannot be greater that Max Filter
         if (filterMaxRepoIssuesRef.current.value !== "" && 
@@ -143,34 +216,35 @@ const RepoFilter = ({ children }) => {
             return issueFilterErrorAlert("add") 
         }
 
+        //Handle the tracking of filtered last input
+        const val = `${filterMinRepoIssuesRef.current.value }|${filterMaxRepoIssuesRef.current.value }`;
+        const type = 'issueFilter';
+
+        //Store and update last filter input
+        trackLastFilterInput(val, type)
+
     }
 
-    const handleFilterRepoByName = (e) => {
+    const handleFilterRepoByName = () => {
+
+        const val = filterRepoNameRef.current.value
 
         //Format and disable the issue filter for flexibility
-        setDisableIssueFilter(filterRepoNameRef.current.value != "" ? true : false)
-        setFilterWarningNote(filterRepoNameRef.current.value != "" ? "The input field for (Filter by number of issues) has been disabled for flexibility." : null)
+        setDisableIssueFilter(val != "" ? true : false)
+        setFilterWarningNote(val != "" ? "The input field for (Filter by number of issues) has been disabled for flexibility." : null)
 
-        if(filterRepoNameRef.current.value === "") {
+        //Store and update last filter input to localStorage
+        const type = "repoByName";
+        trackLastFilterInput(val, type)
+
+        //Validate input value
+        if(val === "") {
+            setRepoFilter({ ...repoFilter, ["name"]: "" });
             //Dispatch the redux backeup to context state
             dispatchAppContext({ type: "SELECTED_ORG_REPO", payload: backupOrgRepo}); 
-            return updateFilterState(backupOrgRepo)
+            return formatFilterState(backupOrgRepo)
         }
-
-        //Check if repo filter exit
-        if(!backupOrgRepo) return false;
-
-        //filter the repo base on the value
-        let filtered = backupOrgRepo.filter(backupOrgRepo => backupOrgRepo['name'].includes(filterRepoNameRef.current.value));
-
-        //Sort alphabetically
-        const newFilteredRepos = sortInputFirst(filterRepoNameRef.current.value, filtered);
-
-        //Dispatch to the context repo list
-        dispatchAppContext({ type: "SELECTED_ORG_REPO", payload: newFilteredRepos });
-
-        updateFilterState(newFilteredRepos)
-
+        setRepoFilter({ ...repoFilter, ['name']: filterRepoNameRef.current.value });
     }
 
     return (

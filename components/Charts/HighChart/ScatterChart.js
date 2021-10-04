@@ -144,12 +144,14 @@ const ScatterChart = ({ data }) => {
   }, [chartValues])
 
   useEffect(async () => {
-    if (filteredRepo.tableLists && filteredRepo.tableLists.length) {
-      setTimeout( async () => {
-        setChartValues(defaultVal)
-        setCanRefresh("loading")
-        await getData();
-      }, 1000);
+    if (filteredRepo.tableLists) {
+      setChartValues(defaultVal)
+      setCanRefresh("loading")
+      if(filteredRepo.tableLists.length > 0) {
+        setTimeout( async () => {
+          await getData();
+        }, 500);
+      }
     }
   }, [filteredRepo]);
 
@@ -170,15 +172,15 @@ const ScatterChart = ({ data }) => {
             filteredRepo.tableLists.map( async element => {
 
               let open = await (await fetch(getTotalOpenIssueCount(`${selectedOrg.login}/${element.name}`), {
-                headers: {
-                  Authorization: `token ${token}`
-                }
+                // headers: {
+                //   Authorization: `token ${token}`
+                // }
               })).json();
         
               let close = await (await fetch(getTotalClosedIssueCount(`${selectedOrg.login}/${element.name}`), {
-                headers: {
-                  Authorization: `token ${token}`
-                }
+                // headers: {
+                //   Authorization: `token ${token}`
+                // }
               })).json();
               
               total = open.total_count + close.total_count;

@@ -25,6 +25,7 @@ const TimeChart = ({ data }) => {
     const { github: { backupOrgRepo } } = useSelector((state) => state);
 
     //State
+    const [canRefresh, setCanRefresh] = useState("no-active");
     const [parameter, setParameter] = useState({
         series: [
             {
@@ -40,7 +41,7 @@ const TimeChart = ({ data }) => {
                 bar: {
                     horizontal: true,
                     // distributed: true,
-                    barHeight: '30%',
+                    barHeight: '20%',
                     dataLabels: {
                         hideOverflowingLabels: false
                     }
@@ -102,10 +103,17 @@ const TimeChart = ({ data }) => {
     //Use Effect
 
     useEffect(async () => {
-        if(filteredRepo.tableLists && filteredRepo.tableLists.length) {
-            const result = await repoTimeline();
-            //Set The state 
-            setParameter({...parameter, ['series']: [{data: result }]})
+        if(filteredRepo.tableLists ) {
+            setParameter({...parameter, ['series']: [{data: [] }]})
+            setCanRefresh("loading")
+
+            if(filteredRepo.tableLists.length > 0) {
+                setTimeout( async () => {
+                    const result = await repoTimeline();
+                    setCanRefresh("no-active")
+                    setParameter({...parameter, ['series']: [{data: result }]})
+                }, 500);
+            }
         }
     }, [filteredRepo]);
     
@@ -137,12 +145,27 @@ const TimeChart = ({ data }) => {
                            <div className="app">
                                 <div className="row">
                                     <div className="mixed-chart">
+                                        {
+                                            canRefresh == "refresh" &&
+                                            <p onClick={getData} className="text-green-500 absolute top-52 z-50 left-1/2 transform -translate-x-4 cursor-pointer">Refresh</p>
+                                        }
+                                        {
+                                            canRefresh == "loading" &&
+                                            <div className="text-green-500 absolute top- top-36 z-50 left-1/2 transform translate-x-4 cursor-pointer">
+                                            <div className={`lds-ring flex justify-center`}>
+                                                <div></div>
+                                                <div></div>
+                                                <div></div>
+                                                <div></div>
+                                            </div>
+                                            </div>
+                                        }
                                         <Chart
                                             options={parameter.options}
                                             series={parameter.series}
                                             type="rangeBar"
                                             width="100%"
-                                            height={350}
+                                            height={filteredRepo.tableLists.length > 0 && filteredRepo.tableLists.length < 3 ? 150 : 350}
                                         />
                                     </div>
                                 </div>

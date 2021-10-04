@@ -14,8 +14,6 @@ export default async function apiRequest({ url, method, body=null, originUrl="de
     token = user ? user.token : null;
   }
 
-  token = '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';
-
   let headers = {
     Accept: "application/json",
     "Content-Type": "application/json",
@@ -38,8 +36,6 @@ export default async function apiRequest({ url, method, body=null, originUrl="de
     });
 
     await dispatchAppContext({ type: "PRELODER", payload: false })
-
-    console.log(response, "org")
 
     switch (response.status) {
 

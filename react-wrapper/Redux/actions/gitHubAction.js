@@ -16,13 +16,18 @@ export const searchOrgAction = async (value, dispatchAppContext) => {
 
     if (res) {
 
-        //Dispatach payload to a redux state
-        // await dispatch({
-        //     type: LOG_USER_IN,
-        //     payload: {
-        //         data: res
-        //     }
-        // });
+      //Dispatach payload to a redux state
+      // await dispatch({
+      //     type: LOG_USER_IN,
+      //     payload: {
+      //         data: res
+      //     }
+      // });
+
+      //Create a filter parmenent storage 
+      //This we use to track the last filtered value the user inputed 
+      const lastTrackedInput = Storage.getItem('track_last_repo_input');
+      if(lastTrackedInput === undefined) Storage.setItem("track_last_repo_input", []);
       
       return res;
     }
