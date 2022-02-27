@@ -149,11 +149,13 @@ const RepoFilter = ({ children }) => {
 
     const formatFilterState = (payload) => {
         //Update the pagination table
-        const newItems = payload.slice(0, paginateRepo.skip)
+        if(payload) {
+            const newItems = payload.slice(0, paginateRepo.skip)
 
-        //Update the General filtered repo context api
-        dispatchAppContext({ type: "FILTERED_REPO", payload: {tableLists: newItems} });
-        dispatchAppContext({ type: "PAGINATE_REPO", payload: { start: 0, size:  5, page: 1 } });
+            //Update the General filtered repo context api
+            dispatchAppContext({ type: "FILTERED_REPO", payload: {tableLists: newItems} });
+            dispatchAppContext({ type: "PAGINATE_REPO", payload: { start: 0, size:  5, page: 1 } });
+        }
     }
 
     const trackLastFilterInput = (val, type) => {
